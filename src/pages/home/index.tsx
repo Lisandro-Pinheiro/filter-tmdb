@@ -1,13 +1,21 @@
 import { Container, Movie, MovieList } from "./components";
 import { useState, useEffect } from "react";
-import { API_KEY } from "../../config/api_key";
+import { API_IMAGE, API_KEY } from "../../config/api_key";
 import { Link } from "react-router-dom";
+import SearchBox from "../../components/movie-filter";
 
+
+interface Movie {
+    id: number;
+    title: string;
+    poster_path: string;
+}
 
 export default function Home(){
 
-    const [movies, setMovies] = useState<any[]>([])
-    const image_path = "https://image.tmdb.org/t/p/w500"
+    const [movies, setMovies] = useState<Movie[]>([]);
+    const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+
 
     useEffect(() => {
         //Consumir a api
@@ -16,15 +24,20 @@ export default function Home(){
             .then(data => setMovies(data.results))
     }, [])
 
+    const handleFilter = (filtered: Movie[]) => {
+        setFilteredMovies(filtered);
+    };
+
     return (
         <Container>
-            <h1>Movies</h1>
+            <h1>Net Filmes</h1>
+            <SearchBox movies={movies} onFilter={handleFilter} />
             <MovieList>
                 {
-                    movies.map(movie => {
+                    filteredMovies.map(movie => {
                         return (
                             <Movie>
-                                <Link to={`/details/${movie.id}`}><img src={`${image_path}${movie.poster_path}`} alt={movie.title}/></Link>
+                                <a href="#"><img src={`${API_IMAGE}${movie.poster_path}`} alt={movie.title}></img></a>
                                 <span>{movie.title}</span>
                             </Movie>
                         )
